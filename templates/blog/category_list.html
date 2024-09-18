@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ category.name }} - وبسایت آموزشی برنامه‌نویسی{% endblock %}
+
+{% block content %}
+<h1 class="mb-4">مطالب دسته‌بندی: {{ category.name }}</h1>
+
+<div class="row">
+    {% for post in page_obj %}
+        <div class="col-md-6 mb-4">
+            <div class="card {% if post.is_premium %}border-warning{% endif %}">
+                {% if post.image %}
+                    <img src="{{ post.image.url }}" class="card-img-top" alt="{{ post.title }}">
+                {% endif %}
+                <div class="card-body">
+                    <h5 class="card-title">
+                        {{ post.title }}
+                        {% if post.is_premium %}
+                            <span class="badge bg-warning text-dark">پریمیوم</span>
+                        {% endif %}
+                    </h5>
+                    <p class="card-text">{{ post.content|truncatewords:30 }}</p>
+                    <a href="{% url 'post_detail' post.id %}" class="btn btn-primary">ادامه مطلب</a>
+                </div>
+                <div class="card-footer text-muted">
+                    نوشته شده توسط {{ post.author.username }} در {{ post.created_at|date:"j F Y" }}
+                </div>
+            </div>
+        </div>
+    {% empty %}
+        <p>هیچ پستی در این دسته‌بندی وجود ندارد.</p>
+    {% endfor %}
+</div>
+
+<nav aria-label="Page navigation">
+    <ul class="pagination justify-content-center">
+        {% if page_obj.has_previous %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.previous_page_number }}">قبلی</a>
+            </li>
+        {% endif %}
+
+        {% for num in page_obj.paginator.page_range %}
+            {% if page_obj.number == num %}
+                <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+            {% else %}
+                <li class="page-item"><a class="page-link" href="?page={{ num }}">{{ num }}</a></li>
+            {% endif %}
+        {% endfor %}
+
+        {% if page_obj.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.next_page_number }}">بعدی</a>
+            </li>
+        {% endif %}
+    </ul>
+</nav>
+{% endblock %}

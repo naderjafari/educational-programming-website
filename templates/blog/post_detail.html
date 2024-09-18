@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ post.title }} - وبسایت آموزشی برنامه‌نویسی{% endblock %}
+
+{% block content %}
+<article class="blog-post">
+    <h1 class="mb-3">{{ post.title }}</h1>
+    <p class="blog-post-meta">نوشته شده توسط {{ post.author.username }} در {{ post.created_at|date:"j F Y" }}</p>
+
+    {% if post.image %}
+        <img src="{{ post.image.url }}" class="img-fluid mb-3" alt="{{ post.title }}">
+    {% endif %}
+
+    <div class="blog-post-content">
+        {{ post.content|safe }}
+    </div>
+
+    <hr>
+
+    <div class="mt-4">
+        <h3>دسته‌بندی‌ها:</h3>
+        {% for category in post.categories.all %}
+            <a href="{% url 'category_list' category.id %}" class="badge bg-secondary text-decoration-none link-light">{{ category.name }}</a>
+        {% endfor %}
+    </div>
+
+    {% if user.is_authenticated %}
+        <form method="post" action="{% url 'toggle_favorite' post.id %}">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-outline-primary mt-3">
+                {% if user in post.favorite_set.all %}
+                    <i class="bi bi-heart-fill"></i> حذف از علاقه‌مندی‌ها
+                {% else %}
+                    <i class="bi bi-heart"></i> افزودن به علاقه‌مندی‌ها
+                {% endif %}
+            </button>
+        </form>
+    {% endif %}
+
+    <hr>
+
+    <section class="mt-5">
+        <h3>نظرات ({{ comments.count }})</h3>
+        {% for comment in comments %}
+            <div class="card mb-3">
+                <div class="card-body">
+                    <h5 class="card-title">{{ comment.author.username }}</h5>
+                    <h6 class="card-subtitle mb-2 text-muted">{{ comment.created_at|date:"j F Y" }}</h6>
+                    <p class="card-text">{{ comment.content }}</p>
+                </div>
+            </div>
+        {% empty %}
+            <p>هنوز نظری ثبت نشده است.</p>
+        {% endfor %}
+    </section>
+
+    {% if user.is_authenticated %}
+        <section class="mt-5">
+            <h3>ثبت نظر جدید</h3>
+            <form method="post" action="{% url 'add_comment' post.id %}">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label for="content" class="form-label">نظر شما</label>
+                    <textarea class="form-control" id="content" name="content" rows="3" required></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">ارسال نظر</button>
+            </form>
+        </section>
+    {% else %}
+        <p class="mt-5">برای ثبت نظر لطفا <a href="{% url 'login' %}">وارد شوید</a>.</p>
+    {% endif %}
+</article>
+{% endblock %}
