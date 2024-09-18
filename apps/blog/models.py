@@ -44,10 +44,12 @@ class Post(models.Model):
         return max(1, round(word_count / words_per_minute))
 
     def get_related_posts(self):
-        return Post.objects.filter(categories__in=self.categories.all()) \
-                   .exclude(id=self.id) \
-                   .annotate(same_categories=Count('categories')) \
-                   .order_by('-same_categories', '-created_at')[:3]
+        return (
+            Post.objects.filter(categories__in=self.categories.all())
+            .exclude(id=self.id)
+            .annotate(same_categories=Count("categories"))
+            .order_by("-same_categories", "-created_at")[:3]
+        )
 
 
 class Comment(models.Model):

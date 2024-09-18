@@ -40,12 +40,12 @@ class PostDetailView(FormMixin, DetailView):
     form_class = CommentForm
 
     def get_success_url(self):
-        return reverse('post_detail', kwargs={'pk': self.object.pk})
+        return reverse("post_detail", kwargs={"pk": self.object.pk})
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['form'] = self.get_form()
-        context['related_posts'] = self.object.get_related_posts()
+        context["form"] = self.get_form()
+        context["related_posts"] = self.object.get_related_posts()
         return context
 
     def post(self, request, *args, **kwargs):
