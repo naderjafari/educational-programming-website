@@ -1,7 +1,9 @@
 from django.views.generic import ListView, DetailView, CreateView, DeleteView
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.shortcuts import get_object_or_404, redirect
-from django.urls import reverse_lazy
+from django.urls import reverse_lazy, reverse
+from django.views.generic.edit import FormMixin
+
 from .models import Post, Category, Comment, Favorite
 from .forms import CommentForm
 
@@ -30,15 +32,36 @@ class CategoryListView(ListView):
         return context
 
 
-class PostDetailView(DetailView):
+class PostDetailView(FormMixin, DetailView):
     model = Post
     template_name = "blog/post_detail.html"
     context_object_name = "post"
 
+    form_class = CommentForm
+
+    def get_success_url(self):
+        return reverse('post_detail', kwargs={'pk': self.object.pk})
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["comments"] = self.object.comments.all().order_by("-created_at")
+        context['form'] = self.get_form()
+        context['related_posts'] = self.object.get_related_posts()
         return context
+
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        form = self.get_form()
+        if form.is_valid():
+            return self.form_valid(form)
+        else:
+            return self.form_invalid(form)
+
+    def form_valid(self, form):
+        comment = form.save(commit=False)
+        comment.post = self.object
+        comment.author = self.request.user
+        comment.save()
+        return super().form_valid(form)
 
 
 class AddCommentView(LoginRequiredMixin, CreateView):

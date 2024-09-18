@@ -1,6 +1,7 @@
 from ckeditor_uploader.fields import RichTextUploadingField
 from django.db import models
 from django.contrib.auth import get_user_model
+from django.db.models import Count
 from django.urls import reverse
 from mptt.models import MPTTModel, TreeForeignKey
 from ckeditor.fields import RichTextField
@@ -41,6 +42,12 @@ class Post(models.Model):
         words_per_minute = 200
         word_count = len(self.content.split())
         return max(1, round(word_count / words_per_minute))
+
+    def get_related_posts(self):
+        return Post.objects.filter(categories__in=self.categories.all()) \
+                   .exclude(id=self.id) \
+                   .annotate(same_categories=Count('categories')) \
+                   .order_by('-same_categories', '-created_at')[:3]
 
 
 class Comment(models.Model):
