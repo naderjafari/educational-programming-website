@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
 from pathlib import Path
+from decouple import config
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -37,6 +38,14 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    # Third-party apps
+    "mptt",
+    "ckeditor",
+    "ckeditor_uploader",
+    "phonenumber_field",
+    # Local apps
+    "apps.accounts.apps.AccountsConfig",
+    "apps.blog.apps.BlogConfig",
 ]
 
 MIDDLEWARE = [
@@ -54,7 +63,7 @@ ROOT_URLCONF = "config.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [],
+        "DIRS": [BASE_DIR / "templates"],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -75,8 +84,12 @@ WSGI_APPLICATION = "config.wsgi.application"
 
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": config("DB_NAME"),
+        "USER": config("DB_USER"),
+        "PASSWORD": config("DB_PASSWORD"),
+        "HOST": config("DB_HOST", default="localhost"),
+        "PORT": config("DB_PORT", default="5432", cast=int),
     }
 }
 
@@ -121,3 +134,75 @@ STATIC_URL = "static/"
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+AUTH_USER_MODEL = "accounts.CustomUser"
+
+APPEND_SLASH = True
+
+
+# تنظیمات فایل‌های استاتیک
+STATIC_URL = "/static/"
+STATIC_ROOT = BASE_DIR / "staticfiles"
+
+# اگر از پوشه‌های استاتیک اضافی استفاده می‌کنید:
+STATICFILES_DIRS = [
+    BASE_DIR / "static",
+]
+
+# تنظیمات فایل‌های رسانه‌ای (اگر استفاده می‌کنید)
+MEDIA_URL = "/media/"
+MEDIA_ROOT = BASE_DIR / "media"
+
+# CKEditor Configuration
+
+CKEDITOR_UPLOAD_PATH = "uploads/"
+CKEDITOR_IMAGE_BACKEND = "pillow"
+
+CKEDITOR_CONFIGS = {
+    "default": {
+        "toolbar": "full",
+        "height": 300,
+        "width": "full",
+        "extraPlugins": ",".join(
+            [
+                "uploadimage",
+                "uploadwidget",
+                "iframe",
+                "dialogui",
+                "dialog",
+                "video",
+            ]
+        ),
+        "toolbar_Custom": [
+            ["Bold", "Italic", "Underline"],
+            [
+                "NumberedList",
+                "BulletedList",
+                "-",
+                "Outdent",
+                "Indent",
+                "-",
+                "JustifyLeft",
+                "JustifyCenter",
+                "JustifyRight",
+                "JustifyBlock",
+            ],
+            ["Link", "Unlink"],
+            ["Image", "Video", "Flash", "Table", "HorizontalRule"],
+            ["TextColor", "BGColor"],
+            ["Smiley", "SpecialChar"],
+            ["Source"],
+        ],
+        "toolbar": "Custom",
+        "allowedContent": True,
+        "video_detector_width": "640",
+        "video_detector_height": "480",
+    },
+}
+
+# CKEDITOR_ALLOW_NONIMAGE_FILES = False  # فقط اجازه آپلود تصاویر
+# CKEDITOR_RESTRICT_BY_USER = True  # محدود کردن آپلود به کاربر فعلی
+# CKEDITOR_RESTRICT_BY_DATE = True  # سازماندهی آپلودها بر اساس تاریخ
+
+# Phone number field settings
+PHONENUMBER_DEFAULT_REGION = "IR"

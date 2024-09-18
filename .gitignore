@@ -21,7 +21,7 @@ env/
 
 # Media and static files
 media/
-static/
+#static/
 
 # Temporary files
 *.swp
@@ -33,3 +33,6 @@ static/
 
 # Windows
 Thumbs.db
+
+# Django
+staticfiles/

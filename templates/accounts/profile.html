@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+
+{% block title %}پروفایل - وبسایت آموزشی برنامه‌نویسی{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-6">
+        <h2 class="mb-4">پروفایل کاربری</h2>
+        <p><strong>نام کاربری:</strong> {{ user.username }}</p>
+        <p><strong>ایمیل:</strong> {{ user.email }}</p>
+        <p><strong>شماره تلفن:</strong> {{ user.phone_number }}</p>
+        {% if user.subscription_end_date %}
+            <p><strong>تاریخ پایان اشتراک:</strong> {{ user.subscription_end_date|date:"j F Y" }}</p>
+        {% else %}
+            <p>شما هنوز اشتراکی ندارید.</p>
+        {% endif %}
+        <a href="{% url 'password_change' %}" class="btn btn-primary">تغییر رمز عبور</a>
+    </div>
+    <div class="col-md-6">
+        <h3>پست‌های مورد علاقه</h3>
+        {% for favorite in user.favorite_set.all %}
+            <div class="card mb-3">
+                <div class="card-body">
+                    <h5 class="card-title">{{ favorite.post.title }}</h5>
+                    <p class="card-text">{{ favorite.post.content|truncatewords:30 }}</p>
+                    <a href="{% url 'post_detail' favorite.post.id %}" class="btn btn-sm btn-primary">مشاهده</a>
+                </div>
+            </div>
+        {% empty %}
+            <p>شما هنوز هیچ پستی را به علاقه‌مندی‌ها اضافه نکرده‌اید.</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
