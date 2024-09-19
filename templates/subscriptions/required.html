@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block title %}اشتراک مورد نیاز است - وبسایت آموزشی برنامه‌نویسی{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="alert alert-warning text-center" role="alert">
+        <h4 class="alert-heading">اشتراک مورد نیاز است</h4>
+        <p>برای دسترسی به این محتوا، شما نیاز به خرید اشتراک دارید.</p>
+        <hr>
+        <p class="mb-0">لطفاً یکی از طرح‌های اشتراک ما را انتخاب کنید تا به تمامی محتوای ویژه دسترسی پیدا کنید.</p>
+    </div>
+    <div class="text-center mt-4">
+        <a href="{% url 'subscriptions:pricing' %}" class="btn btn-primary">مشاهده طرح‌های اشتراک</a>
+    </div>
+</div>
+{% endblock %}

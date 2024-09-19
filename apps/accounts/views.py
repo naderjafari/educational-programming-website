@@ -1,3 +1,6 @@
+import logging
+
+import jdatetime
 from django.views.generic import CreateView, FormView, TemplateView
 from django.contrib.auth.views import LoginView
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -10,6 +13,9 @@ from .models import PhoneVerification, CustomUser
 import random
 import string
 
+from ..blog.models import Favorite
+from ..subscriptions.models import Subscription, Payment
+
 
 class RegisterView(CreateView):
     template_name = "accounts/register.html"
@@ -21,6 +27,7 @@ class RegisterView(CreateView):
         user.is_active = False
         user.save()
         code = "".join(random.choices(string.digits, k=6))
+        logging.warning(f"Use this code: {code}")
         expires_at = timezone.now() + timezone.timedelta(minutes=10)
         PhoneVerification.objects.create(user=user, code=code, expires_at=expires_at)
         # TODO: Send SMS with code
@@ -37,13 +44,17 @@ class VerifyPhoneView(FormView):
         verification = PhoneVerification.objects.filter(
             code=code, expires_at__gt=timezone.now(), user__is_active=False
         ).first()
-        if verification:
+
+        if verification and code == verification.code:
             user = verification.user
             user.is_active = True
             user.is_phone_verified = True
             user.save()
             login(self.request, user)
-        return super().form_valid(form)
+            return super().form_valid(form)
+        else:
+            form.add_error("code", "The verification code is incorrect or expired.")
+            return self.form_invalid(form)
 
 
 class CustomLoginView(LoginView):
@@ -52,3 +63,23 @@ class CustomLoginView(LoginView):
 
 class ProfileView(LoginRequiredMixin, TemplateView):
     template_name = "accounts/profile.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        user = self.request.user
+
+        # اطلاعات اشتراک فعلی
+        active_subscription = Subscription.objects.filter(
+            user=user, is_active=True
+        ).first()
+        context["active_subscription"] = active_subscription
+
+        # تاریخچه پرداخت‌ها
+        payments = Payment.objects.filter(user=user).order_by("-created_at")[:5]
+        context["recent_payments"] = payments
+
+        # پست‌های مورد علاقه
+        favorite_posts = Favorite.objects.filter(user=user).select_related("post")[:5]
+        context["favorite_posts"] = favorite_posts
+
+        return context

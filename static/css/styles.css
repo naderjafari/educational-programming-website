@@ -11,6 +11,15 @@ body {
 }
 
 /* هدر و ناوبری */
+
+/*.navbar-top {*/
+/*    height: 60px;*/
+/*}*/
+
+/*.navbar-bottom {*/
+/*    top: 60px;*/
+/*}*/
+
 .navbar {
     background-color: #ffffff;
     box-shadow: 0 2px 4px rgba(0,0,0,.1);

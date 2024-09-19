@@ -1,34 +1,76 @@
 {% extends 'base.html' %}
+{% load static %}
+{% load jformat %}
 
-{% block title %}پروفایل - وبسایت آموزشی برنامه‌نویسی{% endblock %}
+{% block title %}پروفایل {{ user.username }} - وبسایت آموزشی برنامه‌نویسی{% endblock %}
 
 {% block content %}
-<div class="row">
-    <div class="col-md-6">
-        <h2 class="mb-4">پروفایل کاربری</h2>
-        <p><strong>نام کاربری:</strong> {{ user.username }}</p>
-        <p><strong>ایمیل:</strong> {{ user.email }}</p>
-        <p><strong>شماره تلفن:</strong> {{ user.phone_number }}</p>
-        {% if user.subscription_end_date %}
-            <p><strong>تاریخ پایان اشتراک:</strong> {{ user.subscription_end_date|date:"j F Y" }}</p>
-        {% else %}
-            <p>شما هنوز اشتراکی ندارید.</p>
-        {% endif %}
-        <a href="{% url 'password_change' %}" class="btn btn-primary">تغییر رمز عبور</a>
-    </div>
-    <div class="col-md-6">
-        <h3>پست‌های مورد علاقه</h3>
-        {% for favorite in user.favorite_set.all %}
-            <div class="card mb-3">
-                <div class="card-body">
-                    <h5 class="card-title">{{ favorite.post.title }}</h5>
-                    <p class="card-text">{{ favorite.post.content|truncatewords:30 }}</p>
-                    <a href="{% url 'post_detail' favorite.post.id %}" class="btn btn-sm btn-primary">مشاهده</a>
+<div class="container my-5">
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <div class="card-body text-center">
+                    <img src="{% static 'images/default-avatar.png' %}" alt="{{ user.username }}" class="rounded-circle img-fluid" style="width: 150px;">
+                    <h5 class="my-3">{{ user.get_full_name }}</h5>
+                    <p class="text-muted mb-1">{{ user.email }}</p>
+                    <p class="text-muted mb-4">عضو از {{ user.date_joined|jformat:"%d %B %Y" }}</p>
                 </div>
             </div>
-        {% empty %}
-            <p>شما هنوز هیچ پستی را به علاقه‌مندی‌ها اضافه نکرده‌اید.</p>
-        {% endfor %}
+        </div>
+        <div class="col-md-8">
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">اطلاعات اشتراک</h5>
+                    {% if active_subscription %}
+                        <p><strong>طرح فعلی:</strong> {{ active_subscription.plan.name }}</p>
+                        <p><strong>تاریخ شروع:</strong> {{ active_subscription.start_date|jformat:"%d %B %Y" }}</p>
+                        <p><strong>تاریخ پایان:</strong> {{ active_subscription.end_date|jformat:"%d %B %Y" }}</p>
+                        <p><strong>وضعیت:</strong> <span class="badge bg-success">فعال</span></p>
+                    {% else %}
+                        <p>شما در حال حاضر اشتراک فعالی ندارید.</p>
+                        <a href="{% url 'subscriptions:pricing' %}" class="btn btn-primary">خرید اشتراک</a>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">تاریخچه پرداخت‌ها</h5>
+                    {% if recent_payments %}
+                        <ul class="list-group list-group-flush">
+                        {% for payment in recent_payments %}
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                {{ payment.created_at|jformat:"%d %B %Y" }} - {{ payment.amount }} تومان
+                                <span class="badge bg-{% if payment.status == 'completed' %}success{% else %}danger{% endif %} rounded-pill">
+                                    {{ payment.get_status_display }}
+                                </span>
+                            </li>
+                        {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p>هنوز هیچ پرداختی انجام نشده است.</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">پست‌های مورد علاقه</h5>
+                    {% if favorite_posts %}
+                        <ul class="list-group list-group-flush">
+                        {% for favorite in favorite_posts %}
+                            <li class="list-group-item">
+                                <a href="{% url 'post_detail' favorite.post.id %}">{{ favorite.post.title }}</a>
+                                <small class="text-muted">افزوده شده در {{ favorite.created_at|jformat:"%d %B %Y" }}</small>
+                            </li>
+                        {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p>شما هنوز هیچ پستی را به علاقه‌مندی‌ها اضافه نکرده‌اید.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 {% endblock %}

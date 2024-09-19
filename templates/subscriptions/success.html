@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block title %}اشتراک با موفقیت فعال شد - وبسایت آموزشی برنامه‌نویسی{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="alert alert-success text-center" role="alert">
+        <h4 class="alert-heading">اشتراک شما با موفقیت فعال شد!</h4>
+        <p>از خرید شما متشکریم. اکنون می‌توانید از تمامی امکانات ویژه سایت استفاده کنید.</p>
+        <hr>
+        <p class="mb-0">برای مشاهده جزئیات اشتراک خود، به صفحه پروفایل مراجعه کنید.</p>
+    </div>
+    <div class="text-center mt-4">
+        <a href="{% url 'home' %}" class="btn btn-primary">بازگشت به صفحه اصلی</a>
+    </div>
+</div>
+{% endblock %}

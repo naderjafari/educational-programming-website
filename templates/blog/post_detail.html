@@ -1,107 +1,133 @@
 {% extends 'base.html' %}
 {% load static %}
-{% load custom_filters %}
+{% load blog_custom_filters %}
 
 {% block title %}{{ post.title }} - وبسایت آموزشی برنامه‌نویسی{% endblock %}
 
 {% block content %}
-<div class="container mt-5">
-    <div class="row">
-        <div class="col-lg-8">
-            <article class="blog-post">
-                <h1 class="mb-4">{{ post.title }}</h1>
-                <div class="post-meta mb-4">
+    <div class="container mt-5">
+        <div class="row">
+            <div class="col-lg-8">
+                <article class="blog-post">
+                    <h1 class="mb-4">{{ post.title }}</h1>
+                    <div class="post-meta mb-4">
                     <span class="author">
                         <i class="fas fa-user"></i>
                         {{ post.author.get_full_name|default:post.author.username }}
                     </span>
-                    <span class="date">
+                        <span class="date">
                         <i class="fas fa-calendar-alt"></i>
                         {{ post.created_at|to_jalali }}
                     </span>
-                    {% if post.read_time %}
-                        <span class="read-time">
+                        {% if post.read_time %}
+                            <span class="read-time">
                             <i class="fas fa-clock"></i>
                             {{ post.read_time }} دقیقه مطالعه
                         </span>
-                    {% endif %}
-                    {% if post.is_premium %}
-                        <span class="premium-badge">
+                        {% endif %}
+                        {% if post.is_premium %}
+                            <span class="premium-badge">
                             <i class="fas fa-crown"></i>
                             پریمیوم
                         </span>
+                        {% endif %}
+
+                        {% if user.is_authenticated %}
+                            <form method="post" action="{% url 'toggle_favorite' post.id %}">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-outline-primary mt-3">
+                                    {% if favorite_post %}
+                                        <i class="bi bi-heart-fill"></i> حذف از علاقه‌مندی‌ها
+                                    {% else %}
+                                        <i class="bi bi-heart"></i> افزودن به علاقه‌مندی‌ها
+                                    {% endif %}
+                                </button>
+                            </form>
+                        {% endif %}
+
+                    </div>
+
+
+
+                    {% if post.image %}
+                        <img src="{{ post.image.url }}" class="img-fluid rounded mb-4" alt="{{ post.title }}">
                     {% endif %}
-                </div>
 
-                {% if post.image %}
-                    <img src="{{ post.image.url }}" class="img-fluid rounded mb-4" alt="{{ post.title }}">
-                {% endif %}
-
-                <div class="post-content">
-                    {{ post.content|safe }}
-                </div>
-
-                {% if post.video_url %}
-                    <div class="video-container mt-4">
-                        <h3>ویدیوی مرتبط</h3>
-                        <div class="embed-responsive embed-responsive-16by9">
-                            <iframe class="embed-responsive-item" src="{{ post.video_url }}" allowfullscreen></iframe>
-                        </div>
+                    <div class="post-content">
+                        {{ post.content|safe }}
                     </div>
-                {% endif %}
-            </article>
 
-            <section class="comments mt-5">
-                <h3>نظرات ({{ post.comments.count }})</h3>
-                {% for comment in post.comments.all %}
-                    <div class="comment mb-3 p-3 border rounded">
-                        <div class="comment-meta">
-                            <strong>{{ comment.author.get_full_name|default:comment.author.username }}</strong>
-                            <small class="text-muted">{{ comment.created_at|to_jalali }}</small>
+                    {% if post.video_url %}
+                        <div class="video-container mt-4">
+                            <h3>ویدیوی مرتبط</h3>
+                            <div class="embed-responsive embed-responsive-16by9">
+                                <iframe class="embed-responsive-item" src="{{ post.video_url }}"
+                                        allowfullscreen></iframe>
+                            </div>
                         </div>
-                        <p class="mt-2 mb-0">{{ comment.content }}</p>
-                    </div>
-                {% empty %}
-                    <p>هنوز نظری ثبت نشده است. اولین نفری باشید که نظر می‌دهد!</p>
-                {% endfor %}
-            </section>
+                    {% endif %}
+                </article>
 
-            {% if user.is_authenticated %}
-                <section class="add-comment mt-4">
-                    <h4>نظر خود را بنویسید</h4>
-                    <form method="post" action="{% url 'add_comment' post.id %}">
-                        {% csrf_token %}
-                        <div class="form-group">
-                            <textarea name="content" class="form-control" rows="4" required></textarea>
-                        </div>
-                        <button type="submit" class="btn btn-primary mt-2">ارسال نظر</button>
-                    </form>
-                </section>
-            {% else %}
-                <p class="mt-4">برای ثبت نظر لطفا <a href="{% url 'login' %}">وارد شوید</a>.</p>
-            {% endif %}
-        </div>
-
-         <div class="col-lg-4">
-            <div class="sidebar">
-                <div class="sidebar-section">
-                    <h3>درباره نویسنده</h3>
-                    <p>{{ post.author.get_full_name|default:post.author.username }}</p>
-                </div>
-                <div class="sidebar-section">
-                    <h3>پست‌های مرتبط</h3>
-                    {% for related_post in related_posts %}
-                        <div class="related-post mb-3">
-                            <a href="{% url 'post_detail' related_post.id %}" class="text-decoration-none">
-                                <h5 class="mb-1">{{ related_post.title }}</h5>
-                            </a>
-                            <small class="text-muted">{{ related_post.created_at|to_jalali }}</small>
+                <section class="comments mt-5">
+                    <h3>نظرات ({{ post.comments.count }})</h3>
+                    {% for comment in post.comments.all %}
+                        <div class="comment mb-3 p-3 border rounded">
+                            <div class="comment-meta">
+                                <strong>{{ comment.author.get_full_name|default:comment.author.username }}</strong>
+                                <small class="text-muted">{{ comment.created_at|to_jalali }}</small>
+                            </div>
+                            <p class="mt-2 mb-0">{{ comment.content }}</p>
                         </div>
                     {% empty %}
-                        <p>پست مرتبطی یافت نشد.</p>
+                        <p>هنوز نظری ثبت نشده است. اولین نفری باشید که نظر می‌دهد!</p>
                     {% endfor %}
+                </section>
+
+                {% if user.is_authenticated %}
+                    <section class="add-comment mt-4">
+                        <h4>نظر خود را بنویسید</h4>
+                        <form method="post" action="{% url 'add_comment' post.id %}">
+                            {% csrf_token %}
+                            <div class="form-group">
+                                <textarea name="content" class="form-control" rows="4" required></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-primary mt-2">ارسال نظر</button>
+                        </form>
+                    </section>
+                {% else %}
+                    <p class="mt-4">برای ثبت نظر لطفا <a href="{% url 'login' %}">وارد شوید</a>.</p>
+                {% endif %}
+            </div>
+
+            <div class="col-lg-4">
+                <div class="sidebar">
+                    <div class="sidebar-section">
+                        <div class="mt-4">
+                            <h3>دسته‌بندی‌ها:</h3>
+                            {% for category in post.categories.all %}
+                                <a href="{% url 'category_list' category.id %}"
+                                   class="badge bg-secondary text-decoration-none link-light">{{ category.name }}</a>
+                            {% endfor %}
+                        </div>
+
+
+                    </div>
+
+
+                    <div class="sidebar-section">
+                        <h3>پست‌های مرتبط</h3>
+                        {% for related_post in related_posts %}
+                            <div class="related-post mb-3">
+                                <a href="{% url 'post_detail' related_post.id %}" class="text-decoration-none">
+                                    <h5 class="mb-1">{{ related_post.title }}</h5>
+                                </a>
+                                <small class="text-muted">{{ related_post.created_at|to_jalali }}</small>
+                            </div>
+                        {% empty %}
+                            <p>پست مرتبطی یافت نشد.</p>
+                        {% endfor %}
+                    </div>
                 </div>
             </div>
-    </div>
-</div>
+        </div>
 {% endblock %}

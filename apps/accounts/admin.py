@@ -35,6 +35,16 @@ class CustomUserAdmin(UserAdmin):
     search_fields = ("username", "email", "phone_number")
     ordering = ("username",)
 
+    def subscription_status(self, obj):
+        active_subscription = obj.subscriptions.filter(is_active=True).first()
+        if active_subscription:
+            return f"فعال تا {active_subscription.end_date}"
+        return "بدون اشتراک"
+
+    subscription_status.short_description = "وضعیت اشتراک"
+
+    list_display = UserAdmin.list_display + ("subscription_status",)
+
 
 @admin.register(PhoneVerification)
 class PhoneVerificationAdmin(admin.ModelAdmin):

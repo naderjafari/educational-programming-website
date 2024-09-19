@@ -1,5 +1,6 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+from django.utils import timezone
 from phonenumber_field.modelfields import PhoneNumberField
 
 
@@ -24,6 +25,11 @@ class CustomUser(AbstractUser):
         related_name="custom_user_set",
         related_query_name="custom_user",
     )
+
+    def has_active_subscription(self):
+        return self.subscriptions.filter(
+            is_active=True, end_date__gt=timezone.now()
+        ).exists()
 
     def __str__(self):
         return self.username

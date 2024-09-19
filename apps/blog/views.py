@@ -6,6 +6,7 @@ from django.views.generic.edit import FormMixin
 
 from .models import Post, Category, Comment, Favorite
 from .forms import CommentForm
+from ..subscriptions.utils import user_has_active_subscription
 
 
 class HomeView(ListView):
@@ -43,10 +44,29 @@ class PostDetailView(FormMixin, DetailView):
         return reverse("post_detail", kwargs={"pk": self.object.pk})
 
     def get_context_data(self, **kwargs):
+        user = self.request.user
         context = super().get_context_data(**kwargs)
         context["form"] = self.get_form()
         context["related_posts"] = self.object.get_related_posts()
+        if user.is_authenticated:
+            try:
+                favorite = Favorite.objects.get(user=user, post=self.object)
+            except Favorite.DoesNotExist:
+                favorite = None
+            context["favorite_post"] = favorite
+        else:
+            context["favorite_post"] = (
+                None  # اگر کاربر وارد نشده باشد، علاقه‌مندی موجود نیست
+            )
+
         return context
+
+    def get(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        if self.object.is_premium and not user_has_active_subscription(request.user):
+            return redirect(reverse("subscriptions:subscription_required"))
+        context = self.get_context_data(object=self.object)
+        return self.render_to_response(context)
 
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()

@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
-{% load custom_filters %}
+{% load blog_custom_filters %}
 
 {% block title %}وبسایت آموزشی برنامه‌نویسی{% endblock %}
 
@@ -9,105 +9,114 @@
 {% endblock %}
 
 {% block content %}
-<div class="main-content">
-    <div class="row">
-        <div class="col-md-8">
-            <section class="hero">
-                <h1>خوش آمدید به وبسایت آموزشی برنامه‌نویسی</h1>
-                <p>آخرین مطالب و دوره‌های آموزشی ما را دنبال کنید</p>
-            </section>
+    <div class="main-content">
+        <div class="row">
+            <div class="col-md-8">
+                <section class="hero">
+                    <h1>خوش آمدید به وبسایت آموزشی برنامه‌نویسی</h1>
+                    <p>آخرین مطالب و دوره‌های آموزشی ما را دنبال کنید</p>
+                </section>
 
-            {% for post in posts %}
-                <article class="card post-card mb-4">
-                    <div class="row g-0">
-                        <div class="col-md-4">
-                            {% if post.image %}
-                                <img src="{{ post.image.url }}" class="img-fluid rounded-start" alt="{{ post.title }}">
-                            {% else %}
-                                <img src="{% static 'images/default_post.jpg' %}" class="img-fluid rounded-start" alt="تصویر پیش‌فرض">
-                            {% endif %}
-                        </div>
-                        <div class="col-md-8">
-                            <div class="card-body">
-                                <h2 class="card-title">
-                                    <a href="{% url 'post_detail' post.id %}" class="text-dark text-decoration-none">
-                                        {{ post.title }}
-                                        {% if post.is_premium %}
-                                            <span class="badge bg-warning text-dark">پریمیوم</span>
-                                        {% endif %}
-                                    </a>
-                                </h2>
-                                <p class="card-text">{{ post.content|truncatewords:30|safe }}</p>
-                                <div class="post-meta">
+                {% for post in posts %}
+                    <article class="card post-card mb-4">
+                        <div class="row g-0">
+                            <div class="col-md-4">
+                                {% if post.image %}
+                                    <img src="{{ post.image.url }}" class="img-fluid rounded-start"
+                                         alt="{{ post.title }}">
+                                {% else %}
+                                    <img src="{% static 'images/default_post.jpg' %}" class="img-fluid rounded-start"
+                                         alt="تصویر پیش‌فرض">
+                                {% endif %}
+                            </div>
+                            <div class="col-md-8">
+                                <div class="card-body">
+                                    <h2 class="card-title">
+                                        <a href="{% url 'post_detail' post.id %}"
+                                           class="text-dark text-decoration-none">
+                                            {{ post.title }}
+                                            {% if post.is_premium %}
+                                                <span class="badge bg-warning text-dark">پریمیوم</span>
+                                            {% endif %}
+                                        </a>
+                                    </h2>
+                                    <p class="card-text">{{ post.content|truncatewords:30|safe }}</p>
+                                    <div class="post-meta">
                                     <span class="author">
                                         <i class="fas fa-user"></i>
                                         {{ post.author.get_full_name|default:post.author.username }}
                                     </span>
-                                    <span class="date">
+                                        <span class="date">
                                         <i class="fas fa-calendar-alt"></i>
                                         {{ post.created_at|to_jalali }}
                                     </span>
-                                    {% if post.read_time %}
-                                        <span class="read-time">
+                                        {% if post.read_time %}
+                                            <span class="read-time">
                                             <i class="fas fa-clock"></i>
                                             {{ post.read_time }} دقیقه مطالعه
                                         </span>
-                                    {% endif %}
+                                        {% endif %}
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                </article>
-            {% empty %}
-                <p>متأسفانه هنوز هیچ پستی وجود ندارد.</p>
-            {% endfor %}
+                    </article>
+                {% empty %}
+                    <p>متأسفانه هنوز هیچ پستی وجود ندارد.</p>
+                {% endfor %}
 
-            <nav aria-label="Page navigation" class="mt-4">
-                <ul class="pagination justify-content-center">
-                    {% if page_obj.has_previous %}
-                        <li class="page-item">
-                            <a class="page-link" href="?page={{ page_obj.previous_page_number }}">قبلی</a>
-                        </li>
-                    {% endif %}
-
-                    {% for num in page_obj.paginator.page_range %}
-                        {% if page_obj.number == num %}
-                            <li class="page-item active"><span class="page-link">{{ num }}</span></li>
-                        {% else %}
-                            <li class="page-item"><a class="page-link" href="?page={{ num }}">{{ num }}</a></li>
+                <nav aria-label="Page navigation" class="mt-4">
+                    <ul class="pagination justify-content-center">
+                        {% if page_obj.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.previous_page_number }}">قبلی</a>
+                            </li>
                         {% endif %}
-                    {% endfor %}
 
-                    {% if page_obj.has_next %}
-                        <li class="page-item">
-                            <a class="page-link" href="?page={{ page_obj.next_page_number }}">بعدی</a>
-                        </li>
-                    {% endif %}
-                </ul>
-            </nav>
-        </div>
+                        {% for num in page_obj.paginator.page_range %}
+                            {% if page_obj.number == num %}
+                                <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                            {% else %}
+                                <li class="page-item"><a class="page-link" href="?page={{ num }}">{{ num }}</a></li>
+                            {% endif %}
+                        {% endfor %}
 
-        <div class="col-md-4 sidebar">
-            <section class="mb-5">
-                <h3>موضوعات محبوب</h3>
-                <div>
-                    <a href="#" class="topic-tag">پایتون</a>
-                    <a href="#" class="topic-tag">جاوااسکریپت</a>
-                    <a href="#" class="topic-tag">هوش مصنوعی</a>
-                    <a href="#" class="topic-tag">یادگیری ماشین</a>
-                    <a href="#" class="topic-tag">توسعه وب</a>
-                </div>
-            </section>
+                        {% if page_obj.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.next_page_number }}">بعدی</a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            </div>
 
-            <section>
-                <h3>نویسندگان برتر</h3>
-                <ul class="list-unstyled">
-                    <li>علی محمدی</li>
-                    <li>سارا احمدی</li>
-                    <li>محمد رضایی</li>
-                </ul>
-            </section>
+            <div class="col-md-4 sidebar">
+                <section class="mb-5">
+                    <h3>موضوعات محبوب</h3>
+                    <div>
+                    <a href="#" class="link-info badge text-primary">
+                        <i class="fas fa-tag"></i>
+                        پایتون</a>
+                        <a href="#" class="link-info badge text-primary">
+                            <i class="fas fa-tag"></i>جاوااسکریپت</a>
+                        <a href="#" class="link-info badge text-primary">
+                            <i class="fas fa-tag"></i>هوش مصنوعی</a>
+                        <a href="#" class="link-info badge text-primary">
+                            <i class="fas fa-tag"></i>یادگیری ماشین</a>
+                        <a href="#" class="link-info badge text-primary">
+                            <i class="fas fa-tag"></i>توسعه وب</a>
+                    </div>
+                </section>
+
+                <section>
+                    <h3>نویسندگان برتر</h3>
+                    <ul class="list-unstyled">
+                        <li>علی محمدی</li>
+                        <li>سارا احمدی</li>
+                        <li>محمد رضایی</li>
+                    </ul>
+                </section>
+            </div>
         </div>
     </div>
-</div>
 {% endblock %}

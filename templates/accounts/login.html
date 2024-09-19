@@ -1,25 +1,135 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block title %}ورود - وبسایت آموزشی برنامه‌نویسی{% endblock %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<style>
+    .login-container {
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        border-radius: 15px;
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+        padding: 30px;
+        margin-top: 50px;
+    }
+    .login-title {
+        color: #3a3a3a;
+        margin-bottom: 30px;
+        font-weight: bold;
+    }
+    .form-group {
+        margin-bottom: 20px;
+        position: relative;
+    }
+    .form-control {
+        border-radius: 25px;
+        padding-left: 40px;
+        border: none;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+    .form-icon {
+        position: absolute;
+        left: 15px;
+        top: 38px;
+        color: #007bff;
+    }
+    .btn-login {
+        border-radius: 25px;
+        padding: 10px 30px;
+        font-weight: bold;
+        background-color: #007bff;
+        border: none;
+        transition: all 0.3s ease;
+    }
+    .btn-login:hover {
+        background-color: #0056b3;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 123, 255, 0.3);
+    }
+    .login-options {
+        background-color: rgba(255, 255, 255, 0.7);
+        border-radius: 15px;
+        padding: 20px;
+        margin-top: 30px;
+    }
+    .option-item {
+        display: flex;
+        align-items: center;
+        margin-bottom: 15px;
+    }
+    .option-icon {
+        font-size: 1.5em;
+        color: #28a745;
+        margin-right: 10px;
+    }
+</style>
+{% endblock %}
+
 {% block content %}
-<div class="row justify-content-center">
-    <div class="col-md-6">
-        <h2 class="mb-4">ورود</h2>
-        <form method="post">
-            {% csrf_token %}
-            {% for field in form %}
-                <div class="mb-3">
-                    <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
-                    {{ field }}
-                    {% for error in field.errors %}
-                        <div class="alert alert-danger">{{ error }}</div>
-                    {% endfor %}
+<div class="container">
+    <div class="row login-container">
+        <div class="col-md-6">
+            <h2 class="text-center login-title">ورود به حساب کاربری</h2>
+            <form method="post">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="{{ form.username.id_for_label }}">نام کاربری</label>
+                    <i class="fas fa-user form-icon"></i>
+                    {{ form.username }}
                 </div>
-            {% endfor %}
-            <button type="submit" class="btn btn-primary">ورود</button>
-        </form>
-        <p class="mt-3">حساب کاربری ندارید؟ <a href="{% url 'register' %}">ثبت‌نام کنید</a></p>
+                <div class="form-group">
+                    <label for="{{ form.password.id_for_label }}">رمز عبور</label>
+                    <i class="fas fa-lock form-icon"></i>
+                    {{ form.password }}
+                </div>
+                {% if form.errors %}
+                    <div class="alert alert-danger">
+                        نام کاربری یا رمز عبور اشتباه است. لطفاً دوباره تلاش کنید.
+                    </div>
+                {% endif %}
+                <div class="text-center mt-4">
+                        <button type="submit" class=" btn btn-primary btn-login">
+                        <i class="fas fa-sign-in-alt ms-2"></i>ورود
+                    </button>
+                </div>
+            </form>
+            <p class="mt-3 text-center">
+                حساب کاربری ندارید؟ <a href="{% url 'register' %}">ثبت‌نام کنید</a>
+            </p>
+        </div>
+        <div class="col-md-6">
+            <div class="login-options">
+                <h4 class="mb-3">گزینه‌های دیگر</h4>
+                <div class="option-item">
+                    <i class="ps-2  fas fa-key option-icon"></i>
+                    <a href="#">فراموشی رمز عبور</a>
+                </div>
+                <div class="option-item">
+                    <i class="ps-2  fas fa-envelope option-icon"></i>
+                    <a href="#">ورود با ایمیل</a>
+                </div>
+                <div class="option-item">
+                    <i class="ps-2 fas fa-mobile-alt option-icon"></i>
+                    <a href="#">ورود با شماره موبایل</a>
+                </div>
+                <div class="option-item">
+                    <i class="ps-2 fas fa-question-circle option-icon"></i>
+                    <a href="#">راهنمای ورود</a>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const formControls = document.querySelectorAll('input, select, textarea');
+        formControls.forEach(element => {
+            element.classList.add('form-control');
+        });
+    });
+</script>
 {% endblock %}

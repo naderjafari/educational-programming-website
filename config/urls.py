@@ -15,6 +15,7 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 
+from azbankgateways.urls import az_bank_gateways_urls
 from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
@@ -25,7 +26,8 @@ urlpatterns = [
     path("ckeditor/", include("ckeditor_uploader.urls")),
     path("", include("apps.blog.urls")),
     path("accounts/", include("apps.accounts.urls")),
-    # path('subscriptions/', include('apps.subscriptions.urls')),
+    path("subscriptions/", include("apps.subscriptions.urls")),
+    path("bankgateways/", az_bank_gateways_urls()),
 ]
 
 if settings.DEBUG:

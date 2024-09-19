@@ -43,9 +43,12 @@ INSTALLED_APPS = [
     "ckeditor",
     "ckeditor_uploader",
     "phonenumber_field",
+    "azbankgateways",
+    "django_jalali",
     # Local apps
     "apps.accounts.apps.AccountsConfig",
     "apps.blog.apps.BlogConfig",
+    "apps.subscriptions.apps.SubscriptionsConfig",
 ]
 
 MIDDLEWARE = [
@@ -206,3 +209,49 @@ CKEDITOR_CONFIGS = {
 
 # Phone number field settings
 PHONENUMBER_DEFAULT_REGION = "IR"
+
+# AZ Iranian Bank Gateways settings
+# AZ_IRANIAN_BANK_GATEWAYS = {
+#     'GATEWAYS': {
+#         'ZARINPAL': {
+#             'MERCHANT_CODE': '123456789012345678901234567890123456',  # مرچنت کد تست زرین‌پال
+#             'SANDBOX': True,  # فعال کردن حالت sandbox
+#         },
+#     },
+#     'IS_SAMPLE_FORM_ENABLE': True,
+#     'DEFAULT': 'ZARINPAL',
+#     'CURRENCY': 'IRT',  # یا 'IRR' برای ریال
+#     'TRACKING_CODE_QUERY_PARAM': 'tc',
+#     'TRACKING_CODE_LENGTH': 16,
+#     'SETTING_VALUE_READER_CLASS': 'azbankgateways.readers.DefaultReader',
+#     'BANK_PRIORITIES': ['ZARINPAL'],
+# }
+
+AZ_IRANIAN_BANK_GATEWAYS = {
+    "GATEWAYS": {
+        "PAYV1": {
+            "MERCHANT_CODE": "123456",  # این کد برای sandbox PAYV1 استفاده می‌شود
+            "X_SANDBOX": 1,
+        },
+    },
+    "IS_SAMPLE_FORM_ENABLE": True,
+    "DEFAULT": "PAYV1",
+    "CURRENCY": "IRR",  # یا 'IRT' برای تومان
+    "TRACKING_CODE_QUERY_PARAM": "tc",
+    "TRACKING_CODE_LENGTH": 16,
+}
+
+# Login and Logout URLs
+LOGIN_URL = "login"
+LOGIN_REDIRECT_URL = "home"
+LOGOUT_REDIRECT_URL = "home"
+
+
+# Security settings
+if not DEBUG:
+    SECURE_SSL_REDIRECT = True
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    SECURE_BROWSER_XSS_FILTER = True
+    SECURE_CONTENT_TYPE_NOSNIFF = True
+    X_FRAME_OPTIONS = "DENY"

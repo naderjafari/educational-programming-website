@@ -1,0 +1,125 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% load subscription_custom_filters %}
+
+
+{% block title %}طرح‌های اشتراک - وبسایت آموزشی برنامه‌نویسی{% endblock %}
+
+{% block extra_css %}
+<style>
+    .pricing-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 60px 0;
+        margin-bottom: 40px;
+        border-radius: 0 0 50% 50% / 20%;
+    }
+    .pricing-container {
+        padding: 20px 0;
+    }
+    .pricing-card {
+        background-color: #ffffff;
+        border-radius: 15px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+        margin-bottom: 30px;
+    }
+    .pricing-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+    }
+    .pricing-card-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 20px;
+        border-radius: 15px 15px 0 0;
+        text-align: center;
+    }
+    .pricing-card-body {
+        padding: 30px;
+    }
+    .price {
+        font-size: 2.5rem;
+        font-weight: bold;
+        margin-bottom: 20px;
+    }
+    .feature-list {
+        list-style-type: none;
+        padding: 0;
+    }
+    .feature-list li {
+        margin-bottom: 10px;
+    }
+    .feature-icon {
+        color: #28a745;
+        margin-right: 10px;
+    }
+    .btn-subscribe {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border: none;
+        border-radius: 25px;
+        padding: 10px 30px;
+        color: white;
+        font-weight: bold;
+        transition: all 0.3s ease;
+    }
+    .btn-subscribe:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="pricing-header">
+    <div class="container text-center">
+        <h1 class="display-4">طرح‌های اشتراک ما</h1>
+        <p class="lead">بهترین طرح را برای نیازهای خود انتخاب کنید</p>
+    </div>
+</div>
+
+<div class="container pricing-container">
+    <div class="row">
+        {% for plan in plans %}
+            <div class="col-md-4">
+                <div class="pricing-card">
+                    <div class="pricing-card-header">
+                        <h3>{{ plan.name }}</h3>
+                    </div>
+                    <div class="pricing-card-body">
+                        <div class="price">{{ plan.price|separate_thousands }} تومان</div>
+                        <p>برای {{ plan.duration_days }} روز</p>
+                        <ul class="feature-list">
+                            {% for feature in plan.features %}
+                                <li><i class="fas fa-check feature-icon"></i> {{ feature }}</li>
+                            {% endfor %}
+                        </ul>
+                        <div class="text-center mt-4">
+                            <a href="{% url 'subscriptions:subscribe' plan.id %}" class="btn btn-subscribe">انتخاب طرح</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-12 text-center">
+            <h2>سوالات متداول</h2>
+        </div>
+    </div>
+    <div class="row mt-4">
+        <div class="col-md-6">
+            <h5><i class="fas fa-question-circle me-2"></i>چگونه می‌توانم اشتراک خود را لغو کنم؟</h5>
+            <p>شما می‌توانید در هر زمان از طریق پنل کاربری خود، اشتراک خود را لغو کنید. لغو اشتراک در پایان دوره فعلی اعمال خواهد شد.</p>
+        </div>
+        <div class="col-md-6">
+            <h5><i class="fas fa-credit-card me-2"></i>چه روش‌های پرداختی پذیرفته می‌شود؟</h5>
+            <p>ما انواع کارت‌های اعتباری، درگاه‌های آنلاین و کیف پول‌های الکترونیکی را می‌پذیریم.</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

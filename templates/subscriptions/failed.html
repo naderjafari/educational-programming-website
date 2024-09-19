@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block title %}پرداخت ناموفق - وبسایت آموزشی برنامه‌نویسی{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="alert alert-danger" role="alert">
+        <h4 class="alert-heading">پرداخت ناموفق بود!</h4>
+        <p>متأسفانه پرداخت شما با مشکل مواجه شد. لطفاً دوباره تلاش کنید یا با پشتیبانی تماس بگیرید.</p>
+        <hr>
+        <p class="mb-0">
+            <a href="{% url 'subscriptions:pricing' %}" class="btn btn-primary">مشاهده طرح‌های اشتراک</a>
+            <a href="{% url 'home' %}" class="btn btn-secondary">بازگشت به صفحه اصلی</a>
+        </p>
+    </div>
+</div>
+{% endblock %}
